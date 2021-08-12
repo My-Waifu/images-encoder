@@ -15,7 +15,7 @@ public class ImagesProvider {
     public boolean hasImage(byte[] bytes) {
         ConnectionManager connectionManager = ConnectionManager.getInstance();
         try {
-            PreparedStatement preparedStatement = connectionManager.getConnection().prepareStatement("SELECT bytes FROM images WHERE bytes = ?");
+            PreparedStatement preparedStatement = connectionManager.getConnection().prepareStatement("SELECT bytes FROM data WHERE bytes = ?");
             preparedStatement.setBytes(1, bytes);
             boolean value = preparedStatement.executeQuery().next();
             preparedStatement.close();
@@ -29,11 +29,11 @@ public class ImagesProvider {
     public void addImage(String fileType, String category, String tag, boolean nsfw, byte[] bytes) {
         ConnectionManager connectionManager = ConnectionManager.getInstance();
         try {
-            final PreparedStatement preparedStatement = connectionManager.getConnection().prepareStatement("INSERT INTO images(file_type, category, tag, nsfw, bytes) VALUES (?,?,?,?,?)");
+            final PreparedStatement preparedStatement = connectionManager.getConnection().prepareStatement("INSERT INTO data(file_type, category, tag, nsfw, bytes) VALUES (?,?,?,?,?)");
             preparedStatement.setString(1, fileType);
             preparedStatement.setString(2, category);
             preparedStatement.setString(3, tag);
-            preparedStatement.setBoolean(3, nsfw);
+            preparedStatement.setBoolean(4, nsfw);
             preparedStatement.setBytes(5, bytes);
             preparedStatement.executeUpdate();
             preparedStatement.close();
@@ -45,7 +45,7 @@ public class ImagesProvider {
     public byte[] getImage(int id) {
         ConnectionManager connectionManager = ConnectionManager.getInstance();
         try {
-            final PreparedStatement preparedStatement = connectionManager.getConnection().prepareStatement("SELECT bytes FROM images WHERE id = ?");
+            final PreparedStatement preparedStatement = connectionManager.getConnection().prepareStatement("SELECT bytes FROM data WHERE id = ?");
             preparedStatement.setInt(1, id);
             final ResultSet resultSet = preparedStatement.executeQuery();
             byte[] bytesImage = null;
