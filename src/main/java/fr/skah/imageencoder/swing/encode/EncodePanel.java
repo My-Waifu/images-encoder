@@ -14,11 +14,13 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Objects;
 
 public class EncodePanel extends JPanel implements ActionListener {
 
     private JTextField pathTextField, tagTextField;
-    private JButton encodeButton, folderExplorerButton;
+    private JButton folderExplorerButton, encodeButton;
+    private final JCheckBox nsfwCheckBox = new JCheckBox("NSFW", false);
     private final JFileChooser folderChooser = new JFileChooser();
     private int option;
     private File folder;
@@ -41,6 +43,10 @@ public class EncodePanel extends JPanel implements ActionListener {
         final JLabel tagLabel = new JLabel("Tag :");
         tagLabel.setBounds(20, 55, 60, 25);
         add(tagLabel);
+
+        final JLabel nsfwLabel = new JLabel("NSFW :");
+        nsfwLabel.setBounds(20, 100, 60, 25);
+        add(nsfwLabel);
     }
 
     public void addTextFields() {
@@ -54,17 +60,18 @@ public class EncodePanel extends JPanel implements ActionListener {
     }
 
     public void addButtons() {
-        encodeButton = new JButton("Encode !");
-        encodeButton.setBounds(153, 100, 95, 25);
-        encodeButton.addActionListener(this);
-        add(encodeButton);
-
         folderExplorerButton = new JButton("...");
         folderExplorerButton.setBounds(340, 19, 40, 25);
         folderExplorerButton.addActionListener(this);
         add(folderExplorerButton);
 
+        nsfwCheckBox.setBounds(75, 100, 20, 20);
+        add(nsfwCheckBox);
 
+        encodeButton = new JButton("Encode !");
+        encodeButton.setBounds(153, 100, 95, 25);
+        encodeButton.addActionListener(this);
+        add(encodeButton);
     }
 
     @Override
@@ -86,14 +93,13 @@ public class EncodePanel extends JPanel implements ActionListener {
 
             ConnectionManager.getInstance().connect();
             final ImagesProvider imagesProvider = new ImagesProvider();
-            for (File file : folder.listFiles()) {
-
+            for (File file : Objects.requireNonNull(folder.listFiles())) {
 
                 byte[] bytes = ImagesEncoder.getInstance().encodeImage(file);
                 if (!imagesProvider.hasImage(bytes)) {
                     System.out.println(bytes.length);
                     System.out.println(file.getParentFile().getName() + " a été ajouté dans la db");
-                    imagesProvider.addImage(file.getParentFile().getName(), tagTextField.getText(), bytes);
+                    imagesProvider.addImage(getFileExtension(file), file.getParentFile().getName(), tagTextField.getText(), nsfwCheckBox.isSelected(), bytes);
                 }
             }
 
@@ -103,7 +109,14 @@ public class EncodePanel extends JPanel implements ActionListener {
 
     }
 
-    public void changeStates(boolean value) {
+    private String getFileExtension(File file) {
+        String name = file.getName();
+        int lastIndexOf = name.lastIndexOf(".");
+        if (lastIndexOf == -1) return "";
+        return name.substring(lastIndexOf);
+    }
+
+    private void changeStates(boolean value) {
         pathTextField.setEnabled(value);
         tagTextField.setEnabled(value);
         encodeButton.setEnabled(value);

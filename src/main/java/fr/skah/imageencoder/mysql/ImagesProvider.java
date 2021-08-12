@@ -26,13 +26,15 @@ public class ImagesProvider {
         return false;
     }
 
-    public void addImage(String category, String tag, byte[] bytes) {
+    public void addImage(String fileType, String category, String tag, boolean nsfw, byte[] bytes) {
         ConnectionManager connectionManager = ConnectionManager.getInstance();
         try {
-            final PreparedStatement preparedStatement = connectionManager.getConnection().prepareStatement("INSERT INTO images(category, tag, bytes) VALUES (?,?,?)");
-            preparedStatement.setString(1, category);
-            preparedStatement.setString(2, tag);
-            preparedStatement.setBytes(3, bytes);
+            final PreparedStatement preparedStatement = connectionManager.getConnection().prepareStatement("INSERT INTO images(file_type, category, tag, nsfw, bytes) VALUES (?,?,?,?,?)");
+            preparedStatement.setString(1, fileType);
+            preparedStatement.setString(2, category);
+            preparedStatement.setString(3, tag);
+            preparedStatement.setBoolean(3, nsfw);
+            preparedStatement.setBytes(5, bytes);
             preparedStatement.executeUpdate();
             preparedStatement.close();
         } catch (SQLException throwables) {
@@ -47,7 +49,6 @@ public class ImagesProvider {
             preparedStatement.setInt(1, id);
             final ResultSet resultSet = preparedStatement.executeQuery();
             byte[] bytesImage = null;
-
             while (resultSet.next()) bytesImage = resultSet.getBytes("bytes");
 
 

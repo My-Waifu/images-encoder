@@ -14,7 +14,7 @@ public class ConnectionManager {
 
     private static ConnectionManager instance;
     private Connection connection;
-    private static final String URL = "jdbc:mysql://localhost:3306/pixdb?&user=root&useSSL=false";
+    private static final String URL = "jdbc:mysql://localhost:3306/waifudb?&user=root&useSSL=false";
 
     public ConnectionManager() {
         instance = this;
